@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dynamic Voting Methods</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #071210;
+  --surface: #0d1f1a;
+  --surf2:   #122920;
+  --surf3:   #183322;
+  --border:  #1e3d2a;
+  --bord2:   #2a5438;
+  --g1: #22c55e;
+  --g2: #4ade80;
+  --g3: #86efac;
+  --m1: #22c55e;
+  --m2: #10b981;
+  --m3: #84cc16;
+  --m4: #34d399;
+  --warn:   #fbbf24;
+  --danger: #f87171;
+  --text:   #e2f5ea;
+  --muted:  #4d7a5e;
+  --win:    #4ade80;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -5%, rgba(34,197,94,0.09) 0%,transparent 70%),
+    linear-gradient(rgba(34,197,94,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,197,94,0.025) 1px,transparent 1px);
+  background-size:auto,44px 44px,44px 44px;
+  pointer-events:none;z-index:0;
+}
+.container{max-width:980px;margin:0 auto;padding:2rem 1.5rem 5rem;position:relative;z-index:1;}
+
+/* HEADER */
+header{text-align:center;padding:3.5rem 0 2.5rem;}
+header::after{
+  content:'';display:block;width:160px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--g1),var(--m2),transparent);
+  margin:1.5rem auto 0;border-radius:2px;
+}
+.eyebrow{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.35em;color:var(--g2);text-transform:uppercase;margin-bottom:0.75rem;}
+h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:800;line-height:1.1;
+   background:linear-gradient(135deg,#fff 20%,var(--g2) 55%,var(--m2));
+   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.subtitle{color:var(--muted);margin-top:0.8rem;font-size:0.95rem;}
+.method-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem;margin-top:1.4rem;}
+.method-pill{font-family:'Space Mono',monospace;font-size:0.67rem;letter-spacing:0.06em;padding:0.3rem 0.9rem;border-radius:999px;border:1px solid;}
+.pill-1{color:var(--m1);border-color:var(--m1);background:rgba(34,197,94,0.1);}
+.pill-2{color:var(--m2);border-color:var(--m2);background:rgba(16,185,129,0.1);}
+.pill-3{color:var(--m3);border-color:var(--m3);background:rgba(132,204,22,0.1);}
+.pill-4{color:var(--m4);border-color:var(--m4);background:rgba(52,211,153,0.1);}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.75rem;margin-bottom:1.5rem;transition:border-color 0.3s,box-shadow 0.3s;}
+.card:hover{border-color:rgba(34,197,94,0.35);box-shadow:0 0 28px rgba(34,197,94,0.06);}
+.card-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+.step-badge{width:36px;height:36px;flex-shrink:0;background:linear-gradient(135deg,var(--g1),var(--m2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.8rem;font-weight:700;color:#071210;}
+.card-title{font-size:1.1rem;font-weight:600;color:var(--text);}
+.card-subtitle{font-size:0.8rem;color:var(--muted);margin-top:2px;}
+
+/* FORM */
+label{display:block;font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;color:var(--g2);text-transform:uppercase;margin-bottom:0.5rem;}
+input[type="text"],input[type="number"]{width:100%;background:var(--surf2);border:1px solid var(--bord2);border-radius:8px;padding:0.65rem 1rem;color:var(--text);font-family:'Space Mono',monospace;font-size:0.9rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+input:focus{border-color:var(--g1);box-shadow:0 0 0 3px rgba(34,197,94,0.15);}
+.hint{font-size:0.72rem;color:var(--muted);margin-top:0.4rem;font-family:'Space Mono',monospace;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media(max-width:520px){.row2{grid-template-columns:1fr;}}
+
+/* PREF TABLE */
+#preferences-section{display:none;}
+.pref-title{font-family:'Space Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;color:var(--g2);text-transform:uppercase;margin-bottom:1rem;}
+.pref-table-wrapper{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:0.85rem;}
+th{background:var(--surf3);color:var(--g2);padding:0.6rem 1rem;text-align:center;font-weight:700;border:1px solid var(--bord2);}
+td{padding:0.5rem 0.75rem;border:1px solid var(--border);text-align:center;vertical-align:middle;}
+tr:nth-child(even) td{background:rgba(34,197,94,0.02);}
+.rank-label{color:var(--muted);font-size:0.75rem;}
+.pref-input{width:70px;background:var(--surf2);border:1px solid var(--bord2);border-radius:6px;padding:0.35rem 0.5rem;color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;text-align:center;outline:none;transition:border-color 0.2s;}
+.pref-input:focus{border-color:var(--g1);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.75rem;border-radius:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.2s;border:none;}
+.btn-primary{background:linear-gradient(135deg,var(--g1),var(--m2));color:#071210;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(34,197,94,0.35);}
+.btn-secondary{background:var(--surf2);color:var(--text);border:1px solid var(--bord2);}
+.btn-secondary:hover{border-color:var(--g1);color:var(--g2);}
+.btn-row{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;}
+
+/* ERROR */
+.error-msg{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.25);border-radius:8px;padding:0.75rem 1rem;color:var(--danger);font-family:'Space Mono',monospace;font-size:0.8rem;margin-top:0.75rem;display:none;}
+
+/* RESULTS */
+#results{display:none;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--g1),var(--m2),transparent);margin:2.5rem 0;opacity:0.4;}
+
+/* ── VERDICT HERO ── */
+.verdict-hero{
+  border-radius:20px;padding:2.5rem 2rem;margin-bottom:1.75rem;
+  position:relative;overflow:hidden;border:1px solid var(--bord2);
+  background:var(--surface);
+}
+.verdict-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 90% 80% at 50% 0%,rgba(34,197,94,0.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.verdict-inner{position:relative;z-index:1;}
+.verdict-eyebrow{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--g2);margin-bottom:0.5rem;}
+.verdict-title{font-size:1.1rem;font-weight:600;color:var(--muted);margin-bottom:1.3rem;}
+
+/* winner showcase */
+.winner-showcase{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1.5rem;}
+@media(max-width:640px){.winner-showcase{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:360px){.winner-showcase{grid-template-columns:1fr;}}
+.ws-cell{
+  background:var(--surf2);border:1px solid var(--bord2);border-radius:14px;
+  padding:1.1rem 0.75rem 0.85rem;text-align:center;
+  position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;
+}
+.ws-cell:hover{transform:translateY(-3px);}
+.ws-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+.ws-m1::after{background:var(--m1);}
+.ws-m2::after{background:var(--m2);}
+.ws-m3::after{background:var(--m3);}
+.ws-m4::after{background:var(--m4);}
+.ws-method-label{font-family:'Space Mono',monospace;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.55rem;}
+.ws-m1 .ws-method-label{color:var(--m1);}
+.ws-m2 .ws-method-label{color:var(--m2);}
+.ws-m3 .ws-method-label{color:var(--m3);}
+.ws-m4 .ws-method-label{color:var(--m4);}
+.ws-winner-name{font-size:2.1rem;font-weight:800;line-height:1;letter-spacing:0.04em;}
+.ws-m1 .ws-winner-name{color:var(--m1);}
+.ws-m2 .ws-winner-name{color:var(--m2);}
+.ws-m3 .ws-winner-name{color:var(--m3);}
+.ws-m4 .ws-winner-name{color:var(--m4);}
+.ws-sublabel{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);margin-top:0.4rem;}
+
+/* consensus stripe */
+.cs-stripe{border-radius:12px;padding:1rem 1.25rem;font-size:0.88rem;line-height:1.6;display:flex;align-items:flex-start;gap:0.75rem;}
+.cs-icon{font-size:1.2rem;flex-shrink:0;margin-top:0.05rem;}
+.cs-body{}
+.cs-head{font-size:1rem;font-weight:700;margin-bottom:0.2rem;}
+.cs-detail{font-size:0.81rem;font-weight:400;line-height:1.55;}
+.cs-agree{background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(16,185,129,0.07));border:1px solid rgba(34,197,94,0.3);color:var(--g2);}
+.cs-partial{background:linear-gradient(135deg,rgba(251,191,36,0.1),rgba(251,191,36,0.04));border:1px solid rgba(251,191,36,0.3);color:var(--warn);}
+.cs-disagree{background:linear-gradient(135deg,rgba(248,113,113,0.1),rgba(248,113,113,0.04));border:1px solid rgba(248,113,113,0.25);color:var(--danger);}
+
+/* 2x2 grid */
+.results-grid-4{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;}
+@media(max-width:640px){.results-grid-4{grid-template-columns:1fr;}}
+
+.method-card{background:var(--surf2);border:1px solid var(--bord2);border-radius:14px;padding:1.4rem;position:relative;overflow:hidden;transition:box-shadow 0.2s;}
+.method-card:hover{box-shadow:0 4px 20px rgba(34,197,94,0.08);}
+.method-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.mc-1::before{background:linear-gradient(90deg,var(--m1),transparent);}
+.mc-2::before{background:linear-gradient(90deg,var(--m2),transparent);}
+.mc-3::before{background:linear-gradient(90deg,var(--m3),transparent);}
+.mc-4::before{background:linear-gradient(90deg,var(--m4),transparent);}
+.method-tag{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.85rem;}
+.mc-1 .method-tag{color:var(--m1);}
+.mc-2 .method-tag{color:var(--m2);}
+.mc-3 .method-tag{color:var(--m3);}
+.mc-4 .method-tag{color:var(--m4);}
+.winner-label{font-size:0.72rem;color:var(--muted);margin-bottom:0.2rem;}
+.winner-name{font-size:1.8rem;font-weight:800;letter-spacing:0.05em;}
+.mc-1 .winner-name{color:var(--m1);}
+.mc-2 .winner-name{color:var(--m2);}
+.mc-3 .winner-name{color:var(--m3);}
+.mc-4 .winner-name{color:var(--m4);}
+.score-list{margin-top:1rem;display:flex;flex-direction:column;gap:0.45rem;}
+.score-row{display:flex;align-items:center;gap:0.6rem;}
+.score-cand{font-family:'Space Mono',monospace;font-size:0.8rem;width:28px;text-align:center;font-weight:700;color:var(--muted);}
+.score-bar-bg{flex:1;height:6px;background:var(--bord2);border-radius:3px;overflow:hidden;}
+.score-bar{height:100%;border-radius:3px;transition:width 1s cubic-bezier(0.4,0,0.2,1);width:0;}
+.mc-1 .score-bar{background:var(--m1);}
+.mc-2 .score-bar{background:var(--m2);}
+.mc-3 .score-bar{background:var(--m3);}
+.mc-4 .score-bar{background:var(--m4);}
+.score-val{font-family:'Space Mono',monospace;font-size:0.74rem;color:var(--muted);min-width:38px;text-align:right;}
+.win-row .score-cand{color:var(--win);font-size:0.85rem;}
+.win-row .score-bar{background:var(--win)!important;}
+.win-row .score-val{color:var(--win);font-weight:700;}
+
+/* DETAIL CARDS */
+.detail-card{background:var(--surface);border:1px solid var(--bord2);border-radius:14px;padding:1.5rem;margin-top:1.25rem;}
+.detail-header{display:flex;align-items:center;gap:0.85rem;margin-bottom:1.1rem;}
+.detail-badge{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;}
+.db-3{background:linear-gradient(135deg,var(--m3),#4a7a00);color:#071210;}
+.db-4{background:linear-gradient(135deg,var(--m4),var(--m2));color:#071210;}
+.detail-title{font-size:0.95rem;font-weight:700;color:var(--text);}
+.detail-sub{font-size:0.75rem;color:var(--muted);margin-top:1px;}
+
+/* elim */
+.elim-round{background:rgba(132,204,22,0.05);border:1px solid rgba(132,204,22,0.15);border-radius:10px;padding:0.7rem 1rem;margin-bottom:0.55rem;font-family:'Space Mono',monospace;font-size:0.75rem;}
+.elim-round-num{color:var(--m3);font-weight:700;font-size:0.68rem;letter-spacing:0.1em;margin-bottom:0.3rem;}
+.elim-counts{color:var(--text);}
+.elim-elim{color:var(--danger);margin-top:0.3rem;font-size:0.71rem;}
+.elim-win{color:var(--win);margin-top:0.3rem;font-size:0.71rem;font-weight:700;}
+.elim-banner{margin-top:0.85rem;padding:0.75rem 1rem;background:linear-gradient(135deg,rgba(132,204,22,0.12),rgba(34,197,94,0.08));border:1px solid rgba(132,204,22,0.3);border-radius:10px;font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--m3);font-weight:700;}
+
+/* pairwise */
+.pw-legend{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);margin-bottom:0.85rem;line-height:1.6;}
+.pw-legend .hl{color:var(--win);}
+.pw-wrap{overflow-x:auto;margin-bottom:1rem;}
+.pw-tbl{border-collapse:collapse;font-family:'Space Mono',monospace;font-size:0.78rem;min-width:100%;}
+.pw-tbl th{background:var(--surf3);color:var(--m4);padding:0.5rem 0.7rem;border:1px solid var(--bord2);font-weight:700;}
+.pw-tbl td{padding:0.42rem 0.6rem;border:1px solid var(--border);text-align:center;}
+.pw-win{color:var(--win);font-weight:700;}
+.pw-lose{color:var(--danger);}
+.pw-diag{background:rgba(34,197,94,0.03);color:var(--border);}
+.pw-wcol{color:var(--m4);font-weight:700;background:var(--surf3)!important;}
+.pw-matchups{display:flex;flex-direction:column;gap:0.35rem;margin-bottom:0.85rem;}
+.pw-matchup{font-family:'Space Mono',monospace;font-size:0.72rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;}
+.pw-vs{color:var(--muted);min-width:90px;}
+.pw-sc{color:var(--text);}
+.pw-wr{font-weight:700;font-size:0.7rem;}
+.condorcet-note{background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.25);border-radius:9px;padding:0.65rem 1rem;font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--m4);margin-top:0.85rem;}
+
+/* SUMMARY */
+.pref-display{background:var(--surf2);border:1px solid var(--bord2);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+.pref-display-title{font-family:'Space Mono',monospace;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.85rem;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp 0.5s ease forwards;}
+
+footer{text-align:center;padding:2.5rem 0 1rem;font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);}
+footer span{color:var(--g2);}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Interactive Analyzer</div>
+  <h1>Dynamic Voting Methods</h1>
+  <p class="subtitle">Enter your election data — all four counting methods computed instantly</p>
+  <div class="method-pills">
+    <span class="method-pill pill-1">① Plurality</span>
+    <span class="method-pill pill-2">② Borda Count</span>
+    <span class="method-pill pill-3">③ Plurality w/ Elimination</span>
+    <span class="method-pill pill-4">④ Pairwise Comparison</span>
+  </div>
+</header>
+
+<!-- STEP 1 -->
+<div class="card fade-in">
+  <div class="card-header">
+    <div class="step-badge">01</div>
+    <div>
+      <div class="card-title">Candidates &amp; Voter Groups</div>
+      <div class="card-subtitle">Define who is running and how many distinct voter preference groups exist</div>
+    </div>
+  </div>
+  <div class="row2">
+    <div>
+      <label>Candidate names</label>
+      <input type="text" id="cand-input" placeholder="e.g. p, r, s, t" value="p, r, s, t"/>
+      <div class="hint">Comma-separated — any labels: A, B, C or Alice, Bob…</div>
+    </div>
+    <div>
+      <label>Number of voter groups</label>
+      <input type="number" id="ngroups" min="1" max="20" value="5"/>
+      <div class="hint">Each group has its own vote count &amp; full candidate ranking</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="buildTable()">&#8594; Set Up Preferences</button>
+  </div>
+  <div class="error-msg" id="step1-err"></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="card" id="preferences-section">
+  <div class="card-header">
+    <div class="step-badge">02</div>
+    <div>
+      <div class="card-title">Voter Preferences</div>
+      <div class="card-subtitle">Enter each group's vote count then rank all candidates (Rank 1 = most preferred)</div>
+    </div>
+  </div>
+  <div class="pref-title">Preference Matrix</div>
+  <div class="pref-table-wrapper"><table id="pref-table"></table></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="compute()">&#9889; Calculate All Methods</button>
+    <button class="btn btn-secondary" onclick="resetAll()">&#8635; Reset</button>
+  </div>
+  <div class="error-msg" id="step2-err"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results">
+  <div class="divider"></div>
+
+  <!-- VERDICT HERO -->
+  <div class="verdict-hero fade-in">
+    <div class="verdict-inner">
+      <div class="verdict-eyebrow">Election Results</div>
+      <div class="verdict-title">Winners by each voting method</div>
+      <div class="winner-showcase" id="winner-showcase"></div>
+      <div id="cs-stripe"></div>
+    </div>
+  </div>
+
+  <!-- INPUT SUMMARY -->
+  <div class="pref-display">
+    <div class="pref-display-title">Input Summary — Preference Table</div>
+    <div class="pref-table-wrapper"><table id="summary-table"></table></div>
+  </div>
+
+  <!-- 2x2 SCORE CARDS -->
+  <div class="results-grid-4" id="results-grid"></div>
+
+  <!-- ELIMINATION DETAIL -->
+  <div class="detail-card">
+    <div class="detail-header">
+      <div class="detail-badge db-3">3</div>
+      <div>
+        <div class="detail-title">Plurality with Elimination — Round-by-Round</div>
+        <div class="detail-sub">The candidate with fewest 1st-place votes is eliminated each round until a majority is reached</div>
+      </div>
+    </div>
+    <div id="elim-detail"></div>
+  </div>
+
+  <!-- PAIRWISE DETAIL -->
+  <div class="detail-card">
+    <div class="detail-header">
+      <div class="detail-badge db-4">4</div>
+      <div>
+        <div class="detail-title">Pairwise Comparison — Head-to-Head Matrix</div>
+        <div class="detail-sub">Every candidate matched against every other; candidate with most matchup wins takes the election</div>
+      </div>
+    </div>
+    <div id="pw-detail"></div>
+  </div>
+
+</div>
+</div>
+
+<footer>Built with &lt;/&gt; &nbsp;|&nbsp; <span>Plurality &middot; Borda Count &middot; Plurality w/ Elimination &middot; Pairwise Comparison</span></footer>
+
+<script>
+let candidates=[], nGroups=0;
+
+/* BUILD TABLE */
+function buildTable(){
+  const err=document.getElementById('step1-err');
+  candidates=document.getElementById('cand-input').value.split(',').map(s=>s.trim()).filter(s=>s.length>0);
+  nGroups=parseInt(document.getElementById('ngroups').value);
+  if(candidates.length<2){showErr(err,'Enter at least 2 candidates.');return;}
+  if(isNaN(nGroups)||nGroups<1){showErr(err,'Voter groups must be at least 1.');return;}
+  err.style.display='none';
+  let h='<thead><tr><th>Row</th>';
+  for(let g=0;g<nGroups;g++) h+=`<th>Group ${g+1}</th>`;
+  h+='</tr></thead><tbody><tr><td class="rank-label" style="color:var(--g2)">Votes</td>';
+  for(let g=0;g<nGroups;g++) h+=`<td><input class="pref-input" type="number" id="v${g}" min="0" value="${dv(g)}"/></td>`;
+  h+='</tr>';
+  for(let r=0;r<candidates.length;r++){
+    h+=`<tr><td class="rank-label">Rank ${r+1}</td>`;
+    for(let g=0;g<nGroups;g++) h+=`<td><input class="pref-input" type="text" id="p${r}_${g}" maxlength="30" value="${dp(r,g)}"/></td>`;
+    h+='</tr>';
+  }
+  h+='</tbody>';
+  document.getElementById('pref-table').innerHTML=h;
+  const sec=document.getElementById('preferences-section');
+  sec.style.display='block';
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function dv(g){return candidates.join(',').replace(/\s/g,'')==='p,r,s,t'?([14,10,8,4,1][g]??''):'';}
+function dp(r,g){
+  if(candidates.join(',').replace(/\s/g,'')==='p,r,s,t'){
+    const d=[['p','s','t','r','s'],['r','r','s','t','t'],['s','t','r','s','r'],['t','p','p','p','p']];
+    return(d[r]||[])[g]??'';
+  }return '';
+}
+
+/* READ */
+function readInputs(){
+  const err=document.getElementById('step2-err');
+  const votes=[],prefs=[];
+  for(let g=0;g<nGroups;g++){
+    const v=parseInt(document.getElementById(`v${g}`).value);
+    if(isNaN(v)||v<0){showErr(err,`Invalid vote count for Group ${g+1}.`);return null;}
+    votes.push(v);
+  }
+  for(let g=0;g<nGroups;g++){
+    prefs[g]=[];
+    for(let r=0;r<candidates.length;r++){
+      const val=document.getElementById(`p${r}_${g}`).value.trim();
+      if(!val){showErr(err,`Missing preference: Group ${g+1}, Rank ${r+1}.`);return null;}
+      if(!candidates.includes(val)){showErr(err,`"${val}" (Group ${g+1}, Rank ${r+1}) is not a known candidate.`);return null;}
+      prefs[g].push(val);
+    }
+    if([...new Set(prefs[g])].length!==candidates.length){showErr(err,`Group ${g+1}: each candidate must appear exactly once.`);return null;}
+  }
+  err.style.display='none';
+  return{votes,prefs};
+}
+
+/* COMPUTE */
+function compute(){
+  const data=readInputs();if(!data)return;
+  const{votes,prefs}=data;
+  const R1=calcPlurality(votes,prefs);
+  const R2=calcBorda(votes,prefs);
+  const R3=calcElim(votes,prefs);
+  const R4=calcPairwise(votes,prefs);
+  renderSummary(votes,prefs);
+  renderHero(R1,R2,R3,R4);
+  document.getElementById('results-grid').innerHTML='';
+  [R1,R2,R3,R4].forEach((R,i)=>renderCard(R,i));
+  renderElim(R3);
+  renderPW(R4);
+  const res=document.getElementById('results');
+  res.style.display='block';
+  setTimeout(()=>res.scrollIntoView({behavior:'smooth',block:'start'}),80);
+  setTimeout(()=>{
+    document.querySelectorAll('.score-bar[style]').forEach(b=>{
+      const w=b.style.width;b.style.width='0';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>b.style.width=w));
+    });
+  },250);
+}
+
+/* METHOD 1 - PLURALITY */
+function calcPlurality(votes,prefs){
+  const s={};candidates.forEach(c=>s[c]=0);
+  for(let g=0;g<nGroups;g++) s[prefs[g][0]]+=votes[g];
+  return{method:'Plurality',short:'Plurality',winner:candidates.reduce((a,b)=>s[a]>=s[b]?a:b),scores:s,type:1};
+}
+
+/* METHOD 2 - BORDA COUNT */
+function calcBorda(votes,prefs){
+  const n=candidates.length,s={};candidates.forEach(c=>s[c]=0);
+  for(let g=0;g<nGroups;g++) for(let r=0;r<n;r++) s[prefs[g][r]]+=votes[g]*(n-r);
+  return{method:'Borda Count',short:'Borda',winner:candidates.reduce((a,b)=>s[a]>=s[b]?a:b),scores:s,type:2};
+}
+
+/* METHOD 3 - PLURALITY WITH ELIMINATION */
+function calcElim(votes,prefs){
+  let active=[...candidates];
+  const rounds=[];let winner=null;
+  const total=votes.reduce((a,b)=>a+b,0);
+  while(active.length>1){
+    const c={};active.forEach(x=>c[x]=0);
+    for(let g=0;g<nGroups;g++){const top=prefs[g].find(x=>active.includes(x));if(top)c[top]+=votes[g];}
+    const maj=active.find(x=>c[x]>total/2);
+    if(maj){rounds.push({counts:{...c},elim:[],majority:maj});winner=maj;break;}
+    const minV=Math.min(...active.map(x=>c[x]));
+    const elim=active.filter(x=>c[x]===minV);
+    rounds.push({counts:{...c},elim,majority:null});
+    active=active.filter(x=>!elim.includes(x));
+    if(active.length===1){winner=active[0];break;}
+  }
+  if(!winner&&active.length===1)winner=active[0];
+  const fc=rounds[rounds.length-1]?.counts||{};
+  return{method:'Plurality w/ Elimination',short:'Elimination',winner,scores:fc,rounds,type:3};
+}
+
+/* METHOD 4 - PAIRWISE */
+function calcPairwise(votes,prefs){
+  const n=candidates.length,wins={};
+  candidates.forEach(a=>{wins[a]={};candidates.forEach(b=>wins[a][b]=0);});
+  for(let g=0;g<nGroups;g++)
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){
+      const a=candidates[i],b=candidates[j];
+      const pA=prefs[g].indexOf(a),pB=prefs[g].indexOf(b);
+      if(pA<pB)wins[a][b]+=votes[g];else wins[b][a]+=votes[g];
+    }
+  const pw={},matchups=[];
+  candidates.forEach(a=>{
+    pw[a]=0;
+    candidates.forEach(b=>{
+      if(a!==b&&wins[a][b]>wins[b][a])pw[a]++;
+      if(a<b)matchups.push({a,b,vA:wins[a][b],vB:wins[b][a],winner:wins[a][b]>wins[b][a]?a:wins[b][a]>wins[a][b]?b:'Tie'});
+    });
+  });
+  const maxW=Math.max(...candidates.map(c=>pw[c]));
+  const winner=candidates.filter(c=>pw[c]===maxW)[0];
+  const condorcet=candidates.find(c=>pw[c]===n-1)||null;
+  return{method:'Pairwise Comparison',short:'Pairwise',winner,scores:pw,wins,matchups,condorcet,type:4};
+}
+
+/* RENDER SUMMARY */
+function renderSummary(votes,prefs){
+  let h='<thead><tr><th>Row</th>';
+  for(let g=0;g<nGroups;g++) h+=`<th>Grp ${g+1}</th>`;
+  h+='</tr></thead><tbody>';
+  h+='<tr><td class="rank-label" style="color:var(--g2)">Votes</td>';
+  votes.forEach(v=>h+=`<td style="font-weight:700;color:var(--text)">${v}</td>`);
+  h+='</tr>';
+  for(let r=0;r<candidates.length;r++){
+    h+=`<tr><td class="rank-label">Rank ${r+1}</td>`;
+    for(let g=0;g<nGroups;g++) h+=`<td>${prefs[g][r]}</td>`;
+    h+='</tr>';
+  }
+  h+='</tbody>';
+  document.getElementById('summary-table').innerHTML=h;
+}
+
+/* RENDER VERDICT HERO */
+function renderHero(R1,R2,R3,R4){
+  const methods=[R1,R2,R3,R4];
+  document.getElementById('winner-showcase').innerHTML=methods.map(R=>`
+    <div class="ws-cell ws-m${R.type}">
+      <div class="ws-method-label">${R.short}</div>
+      <div class="ws-winner-name">${R.winner.toUpperCase()}</div>
+      <div class="ws-sublabel">winner</div>
+    </div>`).join('');
+  const winners=methods.map(R=>R.winner);
+  const unique=[...new Set(winners)];
+  const mnames=['Plurality','Borda Count','Elimination','Pairwise'];
+  const detail=methods.map((R,i)=>`${mnames[i]}: <strong>${R.winner.toUpperCase()}</strong>`).join(' &nbsp;&middot;&nbsp; ');
+  let cls,icon,head,body;
+  if(unique.length===1){
+    cls='cs-agree';icon='&#9989;';head=`Full Consensus &mdash; ${winners[0].toUpperCase()} wins`;
+    body=`All four methods agree. <strong>${winners[0].toUpperCase()}</strong> is the unambiguous winner regardless of counting method.`;
+  } else if(unique.length===2){
+    cls='cs-partial';icon='&#9888;&#65039;';head='Partial Agreement';body=detail;
+  } else {
+    cls='cs-disagree';icon='&#10060;';head='Methods Disagree';body=detail;
+  }
+  document.getElementById('cs-stripe').innerHTML=`
+    <div class="cs-stripe ${cls}">
+      <span class="cs-icon">${icon}</span>
+      <div class="cs-body"><div class="cs-head">${head}</div><div class="cs-detail">${body}</div></div>
+    </div>`;
+}
+
+/* RENDER SCORE CARD */
+function renderCard(R,i){
+  const sl=['','pts','','wins'];
+  const vals=candidates.map(c=>R.scores[c]??0);
+  const maxV=Math.max(...vals,1);
+  const rows=candidates.map(c=>{
+    const v=R.scores[c]??0,pct=(v/maxV*100).toFixed(1),win=c===R.winner;
+    return `<div class="score-row ${win?'win-row':''}">
+      <span class="score-cand">${c}</span>
+      <div class="score-bar-bg"><div class="score-bar" style="width:${pct}%"></div></div>
+      <span class="score-val">${v}${sl[i]?(' '+sl[i]):''}</span>
+    </div>`;
+  }).join('');
+  document.getElementById('results-grid').innerHTML+=`
+    <div class="method-card mc-${R.type}">
+      <div class="method-tag">${R.method}</div>
+      <div class="winner-label">Winner</div>
+      <div class="winner-name">${R.winner.toUpperCase()}</div>
+      <div class="score-list">${rows}</div>
+    </div>`;
+}
+
+/* RENDER ELIMINATION */
+function renderElim(R3){
+  let h='';
+  R3.rounds.forEach((round,i)=>{
+    const counts=Object.entries(round.counts).sort((a,b)=>b[1]-a[1])
+      .map(([c,v])=>`<span style="color:var(--text)">${c}</span><span style="color:var(--muted)">:${v}</span>`).join('&nbsp;&nbsp;');
+    h+=`<div class="elim-round">
+      <div class="elim-round-num">ROUND ${i+1}</div>
+      <div class="elim-counts">1st-place votes &rarr; ${counts}</div>`;
+    if(round.majority) h+=`<div class="elim-win">&#10003; ${round.majority.toUpperCase()} reached majority &mdash; winner declared</div>`;
+    else if(round.elim.length>0) h+=`<div class="elim-elim">&#10007; Eliminated: <strong>${round.elim.join(', ')}</strong> (fewest 1st-place votes)</div>`;
+    h+='</div>';
+  });
+  h+=`<div class="elim-banner">&#127942; Plurality w/ Elimination Winner: ${R3.winner.toUpperCase()}</div>`;
+  document.getElementById('elim-detail').innerHTML=h;
+}
+
+/* RENDER PAIRWISE */
+function renderPW(R4){
+  const legend=`<div class="pw-legend">Each cell shows [row votes] &ndash; [column votes] head-to-head. <span class="hl">Green</span> = row won &middot; Red = row lost &middot; "Wins" = total matchup wins.</div>`;
+  let mat=`<div class="pw-wrap"><table class="pw-tbl"><thead><tr><th>vs &rarr;</th>`;
+  candidates.forEach(c=>mat+=`<th>${c}</th>`);
+  mat+=`<th class="pw-wcol">Wins</th></tr></thead><tbody>`;
+  candidates.forEach(a=>{
+    mat+=`<tr><th>${a}</th>`;
+    candidates.forEach(b=>{
+      if(a===b) mat+=`<td class="pw-diag">&mdash;</td>`;
+      else{const va=R4.wins[a][b],vb=R4.wins[b][a];mat+=`<td class="${va>vb?'pw-win':va<vb?'pw-lose':''}">${va}&ndash;${vb}</td>`;}
+    });
+    mat+=`<td class="pw-wcol">${R4.scores[a]}</td></tr>`;
+  });
+  mat+=`</tbody></table></div>`;
+  let mlist=`<div class="pw-matchups">`;
+  R4.matchups.forEach(m=>{
+    const wc=m.winner==='Tie'?'var(--muted)':'var(--win)';
+    const wl=m.winner==='Tie'?'Tie':`&rarr; ${m.winner.toUpperCase()} wins`;
+    mlist+=`<div class="pw-matchup"><span class="pw-vs">${m.a} vs ${m.b}</span><span class="pw-sc">${m.vA} &ndash; ${m.vB}</span><span class="pw-wr" style="color:${wc}">${wl}</span></div>`;
+  });
+  mlist+=`</div>`;
+  const cn=R4.condorcet
+    ?`<div class="condorcet-note">&#9733; Condorcet Winner: <strong>${R4.condorcet.toUpperCase()}</strong> &mdash; beats every other candidate head-to-head. This is the strongest possible win.</div>`
+    :`<div class="condorcet-note" style="color:var(--muted)">&#8505; No Condorcet winner &mdash; no single candidate beat all others head-to-head.</div>`;
+  document.getElementById('pw-detail').innerHTML=legend+mat+mlist+cn;
+}
+
+/* HELPERS */
+function showErr(el,msg){el.textContent=msg;el.style.display='block';}
+function resetAll(){
+  document.getElementById('results').style.display='none';
+  document.getElementById('results-grid').innerHTML='';
+  document.getElementById('preferences-section').style.display='none';
+  ['step1-err','step2-err'].forEach(id=>document.getElementById(id).style.display='none');
+}
+</script>
+</body>
+</html>
