@@ -1,0 +1,968 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     39159,        960]
+NotebookOptionsPosition[     36994,        923]
+NotebookOutlinePosition[     37432,        940]
+CellTagsIndexPosition[     37389,        937]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"Clear", "[", 
+    RowBox[{
+    "cand", ",", "votes", ",", "preferance", ",", "first", ",", "isValid", 
+     ",", "errorMsg"}], "]"}], ";"}], "\[IndentingNewLine]"}], "\n", 
+ RowBox[{
+  RowBox[{"cand", "=", 
+   RowBox[{
+   "Input", "[", 
+    "\"\<Type candidate names inside curly braces, separated by \
+commas.\\nExample: {p, r, s, t}\>\"", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"votes", "=", 
+   RowBox[{
+   "Input", "[", 
+    "\"\<Type the top row of vote counts inside curly braces.\\nExample: {14, \
+10, 8, 4, 1}\>\"", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"preferance", "=", 
+    RowBox[{"Table", "[", 
+     RowBox[{
+      RowBox[{"Input", "[", 
+       RowBox[{"\"\<Type the candidates for Rank \>\"", "<>", 
+        RowBox[{"ToString", "[", "i", "]"}], "<>", 
+        "\"\< inside curly braces.\\nImportant: You must enter exactly \>\"", 
+        "<>", 
+        RowBox[{"ToString", "[", 
+         RowBox[{"Length", "[", "votes", "]"}], "]"}], "<>", 
+        "\"\< items.\\nExample: {p, s, t, r, s}\>\""}], "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"i", ",", "1", ",", 
+        RowBox[{"Length", "[", "cand", "]"}]}], "}"}]}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"isValid", "=", "True"}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"errorMsg", "=", "\"\<\>\""}], ";"}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Length", "[", 
+       RowBox[{"Transpose", "[", "preferance", "]"}], "]"}], "=!=", 
+      RowBox[{"Length", "[", "votes", "]"}]}], ",", 
+     RowBox[{
+      RowBox[{"isValid", "=", "False"}], ";", "\[IndentingNewLine]", 
+      RowBox[{
+      "errorMsg", "=", 
+       "\"\<Error: Dimension Mismatch. The length of your preference rows \
+does not match the number of voter groups.\>\""}]}]}], "]"}], ";"}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"If", "[", 
+    RowBox[{"isValid", ",", 
+     RowBox[{"Do", "[", 
+      RowBox[{
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Sort", "[", 
+           RowBox[{
+            RowBox[{"Transpose", "[", "preferance", "]"}], "[", 
+            RowBox[{"[", "v", "]"}], "]"}], "]"}], "=!=", 
+          RowBox[{"Sort", "[", "cand", "]"}]}], ",", 
+         RowBox[{
+          RowBox[{"isValid", "=", "False"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"errorMsg", "=", 
+           RowBox[{"\"\<Error: Invalid Preference Table! Voter group \>\"", "<>", 
+            RowBox[{"ToString", "[", "v", "]"}], "<>", 
+            "\"\< does not contain a valid ranking of the exact candidates \
+provided.\>\""}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"Break", "[", "]"}], ";"}]}], "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"v", ",", "1", ",", 
+         RowBox[{"Length", "[", "votes", "]"}]}], "}"}]}], "]"}]}], "]"}], 
+   ";"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"If", "[", 
+   RowBox[{"isValid", ",", 
+    RowBox[{
+     RowBox[{"first", "=", 
+      RowBox[{"preferance", "[", 
+       RowBox[{"[", "1", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+     RowBox[{"Print", "[", 
+      RowBox[{"Style", "[", 
+       RowBox[{"\"\<Valid preference table built successfully!\>\"", ",", 
+        RowBox[{"Darker", "[", "Green", "]"}], ",", "Bold"}], "]"}], "]"}], 
+     ";", "\[IndentingNewLine]", 
+     RowBox[{
+     "Print", "[", "\"\<Your entered preferance table is:\\n----------\>\"", 
+      "]"}], ";", 
+     RowBox[{"Print", "[", 
+      RowBox[{"TableForm", "[", 
+       RowBox[{"Prepend", "[", 
+        RowBox[{"preferance", ",", "votes"}], "]"}], "]"}], "]"}]}], ",", 
+    RowBox[{
+     RowBox[{"Print", "[", 
+      RowBox[{"Style", "[", 
+       RowBox[{"errorMsg", ",", "Red", ",", "Bold"}], "]"}], "]"}], ";", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Abort", "[", "]"}], ";"}]}], "]"}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Plurality", " ", "Method"}], "*)"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+  "Print", "[", "\"\<\\n\\n\\n\\n\\nPlurality Method\\n-------------\>\"", 
+   "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"firstvotes", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{"0", ",", 
+     RowBox[{"Length", "[", "cand", "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Do", "[", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"firstvotes", "[", 
+     RowBox[{"[", "i", "]"}], "]"}], "=", 
+    RowBox[{"Total", "[", 
+     RowBox[{"votes", "[", 
+      RowBox[{"[", 
+       RowBox[{"Flatten", "[", 
+        RowBox[{"Position", "[", 
+         RowBox[{"first", ",", 
+          RowBox[{"cand", "[", 
+           RowBox[{"[", "i", "]"}], "]"}]}], "]"}], "]"}], "]"}], "]"}], 
+     "]"}]}], ",", 
+   RowBox[{"{", 
+    RowBox[{"i", ",", "1", ",", 
+     RowBox[{"Length", "[", "cand", "]"}]}], "}"}]}], 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{
+   "\"\<Number of gained first count votes= \>\"", ",", "firstvotes", ",", 
+    "\"\<\\n\>\"", ",", 
+    RowBox[{"Style", "[", 
+     RowBox[{
+      RowBox[{"Row", "[", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Hence winner by Plurality Method is: \>\"", ",", 
+         RowBox[{"cand", "[", 
+          RowBox[{"[", 
+           RowBox[{
+            RowBox[{"Position", "[", 
+             RowBox[{"firstvotes", ",", 
+              RowBox[{"Max", "[", "firstvotes", "]"}]}], "]"}], "[", 
+            RowBox[{"[", 
+             RowBox[{"1", ",", "1"}], "]"}], "]"}], "]"}], "]"}]}], "}"}], 
+       "]"}], ",", 
+      RowBox[{"Darker", "[", "Green", "]"}], ",", "Bold"}], "]"}]}], "]"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Bodra", " ", "Count", " ", "Method"}], 
+   "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+  "Print", "[", "\"\<\\n\\n\\n\\n\\nBorda count Method\\n-------------\>\"", 
+   "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"points", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{"0", ",", 
+     RowBox[{"Length", "[", "cand", "]"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Do", "[", 
+  RowBox[{
+   RowBox[{"Do", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"points", "[", 
+       RowBox[{"[", "j", "]"}], "]"}], "+=", 
+      RowBox[{"Total", "[", 
+       RowBox[{
+        RowBox[{"votes", "[", 
+         RowBox[{"[", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"Position", "[", 
+            RowBox[{
+             RowBox[{"preferance", "[", 
+              RowBox[{"[", "i", "]"}], "]"}], ",", 
+             RowBox[{"cand", "[", 
+              RowBox[{"[", "j", "]"}], "]"}]}], "]"}], "]"}], "]"}], "]"}], 
+        "*", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Length", "[", "preferance", "]"}], "-", "i", "+", "1"}], 
+         ")"}]}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "1", ",", 
+       RowBox[{"Length", "[", "preferance", "]"}]}], "}"}]}], "]"}], ",", 
+   RowBox[{"{", 
+    RowBox[{"j", ",", "1", ",", 
+     RowBox[{"Length", "[", "cand", "]"}]}], "}"}]}], 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Print", "[", 
+   RowBox[{
+   "\"\<Number of Obtained points is= \>\"", ",", "points", ",", 
+    "\"\<\\n\>\"", ",", 
+    RowBox[{"Style", "[", 
+     RowBox[{
+      RowBox[{"Row", "[", 
+       RowBox[{"{", 
+        RowBox[{"\"\<Hence winner by Borda-Count Method is: \>\"", ",", 
+         RowBox[{
+          RowBox[{"cand", "[", 
+           RowBox[{"[", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"Position", "[", 
+              RowBox[{"points", ",", 
+               RowBox[{"Max", "[", "points", "]"}]}], "]"}], "]"}], "]"}], 
+           "]"}], "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], "}"}], "]"}], ",", 
+      RowBox[{"Darker", "[", "Green", "]"}], ",", "Bold"}], "]"}]}], "]"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Plurality", " ", "with", " ", "Elimination", " ", "Method"}], 
+   "*)"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PluralityWithElimination", "[", 
+     RowBox[{"cands_", ",", "vts_", ",", "pref_"}], "]"}], ":=", 
+    RowBox[{"Module", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"activeCands", "=", "cands"}], ",", 
+        RowBox[{"voterProfiles", "=", 
+         RowBox[{"Transpose", "[", "pref", "]"}]}], ",", "firstVotes", ",", 
+        "minVotes", ",", "elimCands", ",", 
+        RowBox[{"majority", "=", 
+         RowBox[{
+          RowBox[{"Total", "[", "vts", "]"}], "/", "2.0"}]}], ",", 
+        RowBox[{"winner", "=", "Null"}], ",", 
+        RowBox[{"round", "=", "1"}], ",", "roundTable"}], "}"}], ",", 
+      "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{
+       "Print", "[", 
+        "\"\<\\n\\n\\n\\n\\nPlurality with Elimination \
+Method\\n-----------------\>\"", "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"While", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Length", "[", "activeCands", "]"}], ">", "0"}], ",", 
+         RowBox[{
+          RowBox[{"firstVotes", "=", 
+           RowBox[{"Table", "[", 
+            RowBox[{
+             RowBox[{"Total", "[", 
+              RowBox[{"vts", "[", 
+               RowBox[{"[", 
+                RowBox[{"Flatten", "[", 
+                 RowBox[{"Position", "[", 
+                  RowBox[{
+                   RowBox[{"voterProfiles", "[", 
+                    RowBox[{"[", 
+                    RowBox[{"All", ",", "1"}], "]"}], "]"}], ",", "c"}], 
+                  "]"}], "]"}], "]"}], "]"}], "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"c", ",", "activeCands"}], "}"}]}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"Print", "[", 
+           RowBox[{
+           "\"\<Round \>\"", ",", "round", ",", 
+            "\"\< first-place vote counts:\>\""}], "]"}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"roundTable", "=", 
+           RowBox[{"Prepend", "[", 
+            RowBox[{
+             RowBox[{"Table", "[", 
+              RowBox[{
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"activeCands", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}], ",", 
+                 RowBox[{"firstVotes", "[", 
+                  RowBox[{"[", "i", "]"}], "]"}]}], "}"}], ",", 
+               RowBox[{"{", 
+                RowBox[{"i", ",", "1", ",", 
+                 RowBox[{"Length", "[", "activeCands", "]"}]}], "}"}]}], 
+              "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"\"\<Candidate\>\"", ",", "\"\<Votes\>\""}], "}"}]}], 
+            "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"Print", "[", 
+           RowBox[{"Grid", "[", 
+            RowBox[{"roundTable", ",", 
+             RowBox[{"Dividers", "->", 
+              RowBox[{"{", 
+               RowBox[{"None", ",", 
+                RowBox[{"{", 
+                 RowBox[{"False", ",", "True", ",", "False"}], "}"}]}], 
+               "}"}]}]}], "]"}], "]"}], ";", "\[IndentingNewLine]", 
+          "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Max", "[", "firstVotes", "]"}], ">", "majority"}], ",", 
+            RowBox[{
+             RowBox[{"Print", "[", 
+              RowBox[{
+              "\"\<\\nMajority achieved in Round \>\"", ",", "round", ",", 
+               "\"\<!\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+             RowBox[{"winner", "=", 
+              RowBox[{"activeCands", "[", 
+               RowBox[{"[", 
+                RowBox[{
+                 RowBox[{"Position", "[", 
+                  RowBox[{"firstVotes", ",", 
+                   RowBox[{"Max", "[", "firstVotes", "]"}]}], "]"}], "[", 
+                 RowBox[{"[", 
+                  RowBox[{"1", ",", "1"}], "]"}], "]"}], "]"}], "]"}]}], ";", 
+             "\[IndentingNewLine]", 
+             RowBox[{"Break", "[", "]"}], ";"}]}], "]"}], ";", 
+          "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+          RowBox[{"minVotes", "=", 
+           RowBox[{"Min", "[", "firstVotes", "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"elimCands", "=", 
+           RowBox[{"activeCands", "[", 
+            RowBox[{"[", 
+             RowBox[{"Flatten", "[", 
+              RowBox[{"Position", "[", 
+               RowBox[{"firstVotes", ",", "minVotes"}], "]"}], "]"}], "]"}], 
+            "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"Print", "[", 
+           RowBox[{
+           "\"\<\\nEliminating (fewest votes = \>\"", ",", "minVotes", ",", 
+            "\"\<): \>\"", ",", "elimCands", ",", "\"\<\\n\>\""}], "]"}], ";",
+           "\[IndentingNewLine]", 
+          RowBox[{"activeCands", "=", 
+           RowBox[{"Complement", "[", 
+            RowBox[{"activeCands", ",", "elimCands"}], "]"}]}], ";", 
+          "\[IndentingNewLine]", 
+          RowBox[{"voterProfiles", "=", 
+           RowBox[{"Map", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"DeleteCases", "[", 
+               RowBox[{"#", ",", 
+                RowBox[{"Alternatives", "@@", "elimCands"}]}], "]"}], "&"}], 
+             ",", "voterProfiles"}], "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"round", "++"}], ";"}]}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Print", "[", 
+        RowBox[{"\"\<\\n\>\"", ",", 
+         RowBox[{"Style", "[", 
+          RowBox[{
+           RowBox[{"Row", "[", 
+            RowBox[{"{", 
+             RowBox[{
+             "\"\<Hence winner by Plurality with Elimination Method is: \>\"",
+               ",", "winner"}], "}"}], "]"}], ",", 
+           RowBox[{"Darker", "[", "Green", "]"}], ",", "Bold"}], "]"}]}], 
+        "]"}], ";"}]}], "\[IndentingNewLine]", "\[IndentingNewLine]", "]"}]}],
+    ";"}], "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"PluralityWithElimination", "[", 
+   RowBox[{"cand", ",", "votes", ",", "preferance"}], "]"}], 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"Pairwise", " ", "Comparison", " ", "Method"}], "*)"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"PairwiseComparison", "[", 
+     RowBox[{"cands_", ",", "vts_", ",", "pref_"}], "]"}], ":=", 
+    RowBox[{"Module", "[", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "voterProfiles", ",", "numCands", ",", "numVoterGroups", ",", "wins", 
+        ",", "losses", ",", "c1", ",", "c2", ",", "rank1", ",", "rank2", ",", 
+        "p1Votes", ",", "p2Votes", ",", "maxWins", ",", "winners", ",", 
+        "summaryTable"}], "}"}], ",", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"voterProfiles", "=", 
+        RowBox[{"Transpose", "[", "pref", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"numCands", "=", 
+        RowBox[{"Length", "[", "cands", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"numVoterGroups", "=", 
+        RowBox[{"Length", "[", "vts", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"wins", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", "numCands", "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", 
+       RowBox[{"losses", "=", 
+        RowBox[{"Table", "[", 
+         RowBox[{"0", ",", 
+          RowBox[{"{", "numCands", "}"}]}], "]"}]}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{
+       "Print", "[", 
+        "\"\<\\n\\n\\n\\n\\nPairwise Comparison Method\\n-------------\>\"", 
+        "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"Do", "[", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"c1", "=", 
+           RowBox[{"cands", "[", 
+            RowBox[{"[", "i", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"c2", "=", 
+           RowBox[{"cands", "[", 
+            RowBox[{"[", "j", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+          RowBox[{"p1Votes", "=", "0"}], ";", "\[IndentingNewLine]", 
+          RowBox[{"p2Votes", "=", "0"}], ";", "\[IndentingNewLine]", 
+          "\[IndentingNewLine]", 
+          RowBox[{"Do", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"rank1", "=", 
+              RowBox[{
+               RowBox[{"Flatten", "[", 
+                RowBox[{"Position", "[", 
+                 RowBox[{
+                  RowBox[{"voterProfiles", "[", 
+                   RowBox[{"[", "v", "]"}], "]"}], ",", "c1"}], "]"}], "]"}], 
+               "[", 
+               RowBox[{"[", "1", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+             RowBox[{"rank2", "=", 
+              RowBox[{
+               RowBox[{"Flatten", "[", 
+                RowBox[{"Position", "[", 
+                 RowBox[{
+                  RowBox[{"voterProfiles", "[", 
+                   RowBox[{"[", "v", "]"}], "]"}], ",", "c2"}], "]"}], "]"}], 
+               "[", 
+               RowBox[{"[", "1", "]"}], "]"}]}], ";", "\[IndentingNewLine]", 
+             RowBox[{"If", "[", 
+              RowBox[{
+               RowBox[{"rank1", "<", "rank2"}], ",", 
+               RowBox[{"p1Votes", "+=", 
+                RowBox[{"vts", "[", 
+                 RowBox[{"[", "v", "]"}], "]"}]}], ",", 
+               RowBox[{"p2Votes", "+=", 
+                RowBox[{"vts", "[", 
+                 RowBox[{"[", "v", "]"}], "]"}]}]}], "]"}]}], ",", 
+            RowBox[{"{", 
+             RowBox[{"v", ",", "1", ",", "numVoterGroups"}], "}"}]}], " ", 
+           "\[IndentingNewLine]", "]"}], ";", "\[IndentingNewLine]", 
+          "\[IndentingNewLine]", 
+          RowBox[{"If", "[", 
+           RowBox[{
+            RowBox[{"p1Votes", ">", "p2Votes"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"wins", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], "+=", "1"}], ";", 
+             RowBox[{
+              RowBox[{"losses", "[", 
+               RowBox[{"[", "j", "]"}], "]"}], "+=", "1"}]}], ",", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"p2Votes", ">", "p1Votes"}], ",", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"wins", "[", 
+                 RowBox[{"[", "j", "]"}], "]"}], "+=", "1"}], ";", 
+               RowBox[{
+                RowBox[{"losses", "[", 
+                 RowBox[{"[", "i", "]"}], "]"}], "+=", "1"}]}], ",", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"wins", "[", 
+                 RowBox[{"[", "i", "]"}], "]"}], "+=", 
+                RowBox[{"1", "/", "2"}]}], ";", 
+               RowBox[{
+                RowBox[{"wins", "[", 
+                 RowBox[{"[", "j", "]"}], "]"}], "+=", 
+                RowBox[{"1", "/", "2"}]}]}]}], " ", 
+             RowBox[{"(*", 
+              RowBox[{"0.5", " ", "wins", " ", "for", " ", "a", " ", "tie"}], 
+              "*)"}], "]"}]}], "]"}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "1", ",", 
+           RowBox[{"numCands", "-", "1"}]}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"j", ",", 
+           RowBox[{"i", "+", "1"}], ",", "numCands"}], "}"}]}], 
+        "\[IndentingNewLine]", "\[IndentingNewLine]", "]"}], ";", 
+       "\[IndentingNewLine]", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"summaryTable", "=", 
+        RowBox[{"Prepend", "[", 
+         RowBox[{
+          RowBox[{"Table", "[", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{
+              RowBox[{"cands", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], ",", 
+              RowBox[{"wins", "[", 
+               RowBox[{"[", "i", "]"}], "]"}], ",", 
+              RowBox[{"losses", "[", 
+               RowBox[{"[", "i", "]"}], "]"}]}], "}"}], ",", 
+            RowBox[{"{", 
+             RowBox[{"i", ",", "1", ",", "numCands"}], "}"}]}], "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{
+           "\"\<Candidate\>\"", ",", "\"\<Wins\>\"", ",", "\"\<Losses\>\""}], 
+           "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+       "\[IndentingNewLine]", 
+       RowBox[{"Print", "[", "\"\<Pairwise win/loss summary:\>\"", "]"}], ";",
+        "\[IndentingNewLine]", 
+       RowBox[{"Print", "[", 
+        RowBox[{"Grid", "[", 
+         RowBox[{"summaryTable", ",", 
+          RowBox[{"Dividers", "->", 
+           RowBox[{"{", 
+            RowBox[{"None", ",", 
+             RowBox[{"{", 
+              RowBox[{"False", ",", "True", ",", "False"}], "}"}]}], 
+            "}"}]}]}], "]"}], "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"maxWins", "=", 
+        RowBox[{"Max", "[", "wins", "]"}]}], ";", "\[IndentingNewLine]", 
+       RowBox[{"winners", "=", 
+        RowBox[{"cands", "[", 
+         RowBox[{"[", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"Position", "[", 
+            RowBox[{"wins", ",", "maxWins"}], "]"}], "]"}], "]"}], "]"}]}], 
+       ";", "\[IndentingNewLine]", 
+       RowBox[{"Print", "[", "\"\<\\n\>\"", "]"}], ";", "\[IndentingNewLine]", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"maxWins", "==", 
+           RowBox[{"numCands", "-", "1"}]}], "&&", 
+          RowBox[{
+           RowBox[{"Length", "[", "winners", "]"}], "==", "1"}]}], ",", 
+         RowBox[{"Print", "[", "\"\<Condorcet winner found!\>\"", "]"}], ",", 
+         RowBox[{
+         "Print", "[", 
+          "\"\<No Condorcet winner. Candidate with most pairwise wins:\>\"", 
+          "]"}]}], "]"}], ";", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+       RowBox[{"Print", "[", 
+        RowBox[{"Style", "[", 
+         RowBox[{
+          RowBox[{"Row", "[", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<Hence winner by Pairwise Comparison Method is: \>\"", ",", 
+             RowBox[{"Row", "[", 
+              RowBox[{"winners", ",", "\"\<, \>\""}], "]"}]}], "}"}], "]"}], 
+          ",", 
+          RowBox[{"Darker", "[", "Green", "]"}], ",", "Bold"}], "]"}], "]"}], 
+       ";"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{"PairwiseComparison", "[", 
+  RowBox[{"cand", ",", "votes", ",", "preferance"}], 
+  "]"}], "\[IndentingNewLine]", 
+ RowBox[{"ClearAll", "[", "\"\<Global`*\>\"", "]"}]}], "Input",
+ CellChangeTimes->{{3.9897125136465206`*^9, 3.989712586161981*^9}, {
+   3.989712642262987*^9, 3.989712697198352*^9}, {3.9897127379295664`*^9, 
+   3.989712763510894*^9}, {3.9897128362747965`*^9, 3.9897128960914807`*^9}, 
+   3.989714632631036*^9, {3.9897147280880346`*^9, 3.9897147407026706`*^9}, 
+   3.9897148382348905`*^9, 3.98971628361025*^9, 3.989716458867593*^9, {
+   3.9897165264512286`*^9, 3.9897165276466436`*^9}, {3.989716612129325*^9, 
+   3.9897166134234276`*^9}, 3.989717252724546*^9, 3.9897178280749683`*^9, {
+   3.9897279077727094`*^9, 3.9897279348957996`*^9}, {3.989727981314506*^9, 
+   3.989727984361165*^9}, 3.989728510739978*^9, 3.9897285822207413`*^9, {
+   3.989728635837252*^9, 3.989728646659609*^9}, 3.989728701122217*^9, 
+   3.989728734464155*^9},
+ CellLabel->"In[72]:=",ExpressionUUID->"dcbe226c-29ab-4f6d-96d6-eec79f53b2d4"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ StyleBox["\<\"Valid preference table built successfully!\"\>",
+  StripOnInput->False,
+  LineColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  FrontFaceColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  BackFaceColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  GraphicsColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  FontWeight->Bold,
+  FontColor->RGBColor[0, 
+    Rational[2, 3], 0]]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.989728757110394*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"85525dda-a47a-4e87-b769-098100e9d4f5"],
+
+Cell[BoxData["\<\"Your entered preferance table is:\\n----------\"\>"], \
+"Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571227827`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"b86d5f94-925c-4aaa-b649-bbe6668ebe1e"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"1", "2"},
+    {"a", "b"},
+    {"b", "a"}
+   },
+   GridBoxAlignment->{"Columns" -> {{Left}}, "Rows" -> {{Baseline}}},
+   GridBoxSpacings->{"Columns" -> {
+       Offset[0.27999999999999997`], {
+        Offset[2.0999999999999996`]}, 
+       Offset[0.27999999999999997`]}, "Rows" -> {
+       Offset[0.2], {
+        Offset[0.4]}, 
+       Offset[0.2]}}],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.989728757133769*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"ab5dbf5a-5703-4249-a22c-5ce919123f6e"],
+
+Cell[BoxData["\<\"\\n\\n\\n\\n\\nPlurality Method\\n-------------\"\>"], \
+"Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571542397`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"4c45597b-c891-4a63-9ce1-84664e939b1c"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Number of gained first count votes= \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"1", ",", "2"}], "}"}], "\[InvisibleSpace]", "\<\"\\n\"\>", 
+   "\[InvisibleSpace]", 
+   StyleBox[
+    TemplateBox[{"\"Hence winner by Plurality Method is: \"", "b"},
+     "RowDefault"],
+    StripOnInput->False,
+    LineColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    FrontFaceColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    BackFaceColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    GraphicsColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    FontWeight->Bold,
+    FontColor->RGBColor[0, 
+      Rational[2, 3], 0]]}],
+  SequenceForm["Number of gained first count votes= ", {1, 2}, "\n", 
+   Style[
+    Row[{"Hence winner by Plurality Method is: ", $CellContext`b}], 
+    RGBColor[0, 
+     Rational[2, 3], 0], Bold]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571542397`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"03f1a6ed-8b04-420c-8046-115016da874b"],
+
+Cell[BoxData["\<\"\\n\\n\\n\\n\\nBorda count Method\\n-------------\"\>"], \
+"Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571698666`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"41333fb7-b5c4-4ee6-8f3b-10778f24e656"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Number of Obtained points is= \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"4", ",", "5"}], "}"}], "\[InvisibleSpace]", "\<\"\\n\"\>", 
+   "\[InvisibleSpace]", 
+   StyleBox[
+    TemplateBox[{"\"Hence winner by Borda-Count Method is: \"", "b"},
+     "RowDefault"],
+    StripOnInput->False,
+    LineColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    FrontFaceColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    BackFaceColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    GraphicsColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    FontWeight->Bold,
+    FontColor->RGBColor[0, 
+      Rational[2, 3], 0]]}],
+  SequenceForm["Number of Obtained points is= ", {4, 5}, "\n", 
+   Style[
+    Row[{"Hence winner by Borda-Count Method is: ", $CellContext`b}], 
+    RGBColor[0, 
+     Rational[2, 3], 0], Bold]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571789317`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"0079b810-f8be-4d78-a885-b4da54215a97"],
+
+Cell[BoxData["\<\"\\n\\n\\n\\n\\nPlurality with Elimination \
+Method\\n-----------------\"\>"], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571789317`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"23541bfb-1c45-4e0d-beb3-03ab87639692"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Round \"\>", "\[InvisibleSpace]", "1", 
+   "\[InvisibleSpace]", "\<\" first-place vote counts:\"\>"}],
+  SequenceForm["Round ", 1, " first-place vote counts:"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287571945624`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"8a690e12-6643-4920-9946-8ccbdfa81624"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Candidate\"\>", "\<\"Votes\"\>"},
+    {"a", "1"},
+    {"b", "2"}
+   },
+   AutoDelete->False,
+   GridBoxDividers->{"Columns" -> {{None}}, "Rows" -> {False, True, False}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287572058887`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"43f0fd85-5168-4aa6-a40b-f051236d11fb"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"\\nMajority achieved in Round \"\>", "\[InvisibleSpace]", "1", 
+   "\[InvisibleSpace]", "\<\"!\"\>"}],
+  SequenceForm["\nMajority achieved in Round ", 1, "!"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287572077894`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"814e0a4c-dabe-431d-828d-12a620a1820b"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"\\n\"\>", "\[InvisibleSpace]", 
+   StyleBox[
+    TemplateBox[{
+     "\"Hence winner by Plurality with Elimination Method is: \"", "b"},
+     "RowDefault"],
+    StripOnInput->False,
+    LineColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    FrontFaceColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    BackFaceColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    GraphicsColor->RGBColor[0, 
+      Rational[2, 3], 0],
+    FontWeight->Bold,
+    FontColor->RGBColor[0, 
+      Rational[2, 3], 0]]}],
+  SequenceForm["\n", 
+   Style[
+    Row[{"Hence winner by Plurality with Elimination Method is: ", \
+$CellContext`b}], 
+    RGBColor[0, 
+     Rational[2, 3], 0], Bold]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287572077894`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"f5c8cdcf-e942-47b9-b17c-24eae77b9e22"],
+
+Cell[BoxData["\<\"\\n\\n\\n\\n\\nPairwise Comparison Method\\n-------------\"\
+\>"], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.989728757230709*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"abb8faf1-45b6-4e9e-9416-451bb305acbf"],
+
+Cell[BoxData["\<\"Pairwise win/loss summary:\"\>"], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.989728757231894*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"9068fd85-0c3f-478f-a3e4-e965c1b1791a"],
+
+Cell[BoxData[
+ TagBox[GridBox[{
+    {"\<\"Candidate\"\>", "\<\"Wins\"\>", "\<\"Losses\"\>"},
+    {"a", "0", "1"},
+    {"b", "1", "0"}
+   },
+   AutoDelete->False,
+   GridBoxDividers->{"Columns" -> {{None}}, "Rows" -> {False, True, False}},
+   GridBoxItemSize->{"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}],
+  "Grid"]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.989728757231894*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"13ef3446-ce77-4844-9bfe-5c07a01dbd27"],
+
+Cell[BoxData["\<\"\\n\"\>"], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287572534885`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"fd4091bd-44b3-4f9f-ab4d-18f81abfecb4"],
+
+Cell[BoxData["\<\"Condorcet winner found!\"\>"], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287572534885`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"6dedab80-9f40-46f5-beb2-be8551edb112"],
+
+Cell[BoxData[
+ StyleBox[
+  TemplateBox[{"\"Hence winner by Pairwise Comparison Method is: \"", 
+    TemplateBox[{", ", "\", \"", "b"}, "RowWithSeparators"]},
+   "RowDefault"],
+  StripOnInput->False,
+  LineColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  FrontFaceColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  BackFaceColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  GraphicsColor->RGBColor[0, 
+    Rational[2, 3], 0],
+  FontWeight->Bold,
+  FontColor->RGBColor[0, 
+    Rational[2, 3], 0]]], "Print",
+ CellChangeTimes->{3.9897127046155505`*^9, 3.989712765119258*^9, 
+  3.9897134236545486`*^9, 3.9897147802288427`*^9, 3.9897171830156646`*^9, 
+  3.9897179042911396`*^9, 3.9897278832744274`*^9, 3.9897279546131835`*^9, 
+  3.989728535212108*^9, 3.9897286080437365`*^9, 3.9897287572534885`*^9},
+ CellLabel->
+  "During evaluation of \
+In[72]:=",ExpressionUUID->"9f9e1e86-d8f4-4a32-9361-95f7a8cb7a55"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1024.5, 513.75},
+WindowMargins->{{-6, Automatic}, {Automatic, -6}},
+Magnification:>0.75 Inherited,
+FrontEndVersion->"13.0 for Microsoft Windows (64-bit) (December 2, 2021)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"c2d9d5dc-d3e5-41e1-86fe-5e698c809a5f"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 23662, 579, 1850, "Input",ExpressionUUID->"dcbe226c-29ab-4f6d-96d6-eec79f53b2d4"],
+Cell[CellGroupData[{
+Cell[24267, 605, 786, 20, 18, "Print",ExpressionUUID->"85525dda-a47a-4e87-b769-098100e9d4f5"],
+Cell[25056, 627, 476, 8, 30, "Print",ExpressionUUID->"b86d5f94-925c-4aaa-b649-bbe6668ebe1e"],
+Cell[25535, 637, 840, 22, 42, "Print",ExpressionUUID->"ab5dbf5a-5703-4249-a22c-5ce919123f6e"],
+Cell[26378, 661, 477, 8, 96, "Print",ExpressionUUID->"4c45597b-c891-4a63-9ce1-84664e939b1c"],
+Cell[26858, 671, 1285, 33, 30, "Print",ExpressionUUID->"03f1a6ed-8b04-420c-8046-115016da874b"],
+Cell[28146, 706, 479, 8, 96, "Print",ExpressionUUID->"41333fb7-b5c4-4ee6-8f3b-10778f24e656"],
+Cell[28628, 716, 1277, 33, 30, "Print",ExpressionUUID->"0079b810-f8be-4d78-a885-b4da54215a97"],
+Cell[29908, 751, 498, 8, 96, "Print",ExpressionUUID->"23541bfb-1c45-4e0d-beb3-03ab87639692"],
+Cell[30409, 761, 633, 12, 18, "Print",ExpressionUUID->"8a690e12-6643-4920-9946-8ccbdfa81624"],
+Cell[31045, 775, 702, 16, 42, "Print",ExpressionUUID->"43f0fd85-5168-4aa6-a40b-f051236d11fb"],
+Cell[31750, 793, 632, 12, 30, "Print",ExpressionUUID->"814e0a4c-dabe-431d-828d-12a620a1820b"],
+Cell[32385, 807, 1131, 32, 30, "Print",ExpressionUUID->"f5c8cdcf-e942-47b9-b17c-24eae77b9e22"],
+Cell[33519, 841, 485, 8, 96, "Print",ExpressionUUID->"abb8faf1-45b6-4e9e-9416-451bb305acbf"],
+Cell[34007, 851, 452, 7, 18, "Print",ExpressionUUID->"9068fd85-0c3f-478f-a3e4-e965c1b1791a"],
+Cell[34462, 860, 727, 16, 42, "Print",ExpressionUUID->"13ef3446-ce77-4844-9bfe-5c07a01dbd27"],
+Cell[35192, 878, 431, 7, 30, "Print",ExpressionUUID->"fd4091bd-44b3-4f9f-ab4d-18f81abfecb4"],
+Cell[35626, 887, 451, 7, 18, "Print",ExpressionUUID->"6dedab80-9f40-46f5-beb2-be8551edb112"],
+Cell[36080, 896, 886, 23, 18, "Print",ExpressionUUID->"9f9e1e86-d8f4-4a32-9361-95f7a8cb7a55"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
